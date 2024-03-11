@@ -3,6 +3,8 @@ import UserModel from "../models/userModel.js";
 import { generateToken } from "../config/generateToken.js";
 import User from "../models/userModel.js";
 import bcrypt from "bcryptjs";
+import sendEmail from "../utils/sendEmail.js";
+import crypto from "crypto";
 
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
@@ -92,4 +94,98 @@ const logoutUser = asyncHandler(async (req, res) => {
     message: "Logged Out Successfully",
   });
 });
-export { loginUser, registerUser, updateUser, logoutUser };
+
+const forgotPassword = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User Not Found");
+  }
+
+  const resetToken = user.createPasswordResetToken();
+  // console.log(resetToken);
+
+  await user.save();
+
+  const resetUrl = `${req.protocol}://${req.get(
+    "host"
+  )}/api/users/reset-password/${resetToken}`;
+
+  const message = `Forgot Password? Click on this this link to reset your Password: ${resetUrl}`;
+
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: "Your Password reset token. (valid for 10mins)",
+      message,
+    });
+
+    res.status(200).json({
+      message: "Token Sent to email!",
+    });
+  } catch (error) {
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    user.save();
+    console.log(error);
+
+    res.status(500).json({
+      status: "error",
+      message:
+        "There was an error in sending the email. Please Try again later",
+    });
+  }
+});
+
+const resetPassword = asyncHandler(async (req, res) => {
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(req.params.resetToken)
+    .digest("hex");
+
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    res.status(400).json({
+      status: "fail",
+      message: "Token is invalid or has expired",
+    });
+  }
+
+  if (req.body.password) {
+    //hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(req.body.password, salt);
+
+    user.password = hashedPassword;
+  }
+
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+
+  await user.save();
+
+  generateToken(res, user._id);
+
+  res.json({
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    isAdmin: user.isAdmin,
+  });
+});
+
+export {
+  loginUser,
+  registerUser,
+  updateUser,
+  logoutUser,
+  forgotPassword,
+  resetPassword,
+};
