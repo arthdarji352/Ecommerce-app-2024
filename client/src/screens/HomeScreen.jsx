@@ -18,7 +18,7 @@ const HomeScreen = () => {
     <>
       <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4">
         {products?.map((product, i) => (
-          <Product product={product} />
+          <Product key={product._id} product={product} />
         ))}
       </div>
     </>

@@ -9,6 +9,11 @@ import crypto from "crypto";
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
+  if (!email || !password) {
+    res.status(400);
+    throw new Error("Please enter Email and password");
+  }
+
   const user = await UserModel.findOne({ email });
 
   if (user && (await user.matchPassword(password))) {

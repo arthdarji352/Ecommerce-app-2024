@@ -60,7 +60,9 @@ const Header = () => {
               </li>
             </ul>
           </div>
-          <button className="text-white">Sign In</button>
+          <Link to="/login">
+            <button className="text-white">Sign In</button>
+          </Link>
         </div>
         <div className="sm:hidden">
           <button
