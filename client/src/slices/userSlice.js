@@ -18,8 +18,13 @@ const userSlice = createSlice({
       const expirationTime = new Date() + 30 * 24 * 60 * 60 * 1000; // 30 days
       localStorage.setItem("expirationTime", expirationTime);
     },
+    logout: (state) => {
+      state.userInfo = null;
+      localStorage.removeItem("userInfo");
+      localStorage.removeItem("expirationTime");
+    },
   },
 });
 
-export const { setCredentials } = userSlice.actions;
+export const { setCredentials, logout } = userSlice.actions;
 export default userSlice.reducer;

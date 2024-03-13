@@ -1,14 +1,72 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { FiShoppingCart, FiUser, FiLogOut } from "react-icons/fi";
-import { useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { FiShoppingCart, FiUser, FiLogOut, FiLogIn } from "react-icons/fi";
+import { FaCaretUp, FaCaretDown } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import { logout } from "../slices/userSlice";
+import { useLogoutMutation } from "../slices/userApiSlice";
 
 const Header = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
   const { cartItems } = useSelector((state) => state.cart);
+  const { userInfo } = useSelector((state) => state.user);
+  // console.log(userInfo);
 
+  const [logoutApi] = useLogoutMutation();
+
+  const handleLogout = async () => {
+    try {
+      await logoutApi().unwrap();
+      dispatch(logout());
+      navigate("/login");
+      toast.success("Logged Out Successfully");
+    } catch (error) {
+      toast.error(error?.data?.message || error?.error);
+    }
+  };
+  const renderProfileButton = () => {
+    return (
+      <>
+        <button
+          onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+          className="text-white flex items-center"
+        >
+          <FiUser className="mr-1" />
+          {userInfo?.name}
+          {isProfileMenuOpen ? <FaCaretUp /> : <FaCaretDown />}
+        </button>
+        <ul
+          className={`absolute ${
+            isProfileMenuOpen ? "block" : "hidden"
+          } bg-gray-800 p-2 mt-2 space-y-2 text-white border rounded-md`}
+        >
+          <li>
+            <Link to="/profile">
+              <FiUser className="mr-1" />
+              Profile
+            </Link>
+          </li>
+          <li onClick={handleLogout}>
+            <Link>
+              <FiLogOut className="mr-1" />
+              Logout
+            </Link>
+          </li>
+        </ul>
+      </>
+    );
+  };
+  const renderSignInButton = () => (
+    <Link className="flex items-center" to="/login">
+      <FiLogIn className="mr-1 text-white" />
+      <button className="text-white">Sign In</button>
+    </Link>
+  );
   return (
     <nav className="bg-gray-800 p-4">
       <div className="flex items-center justify-between">
@@ -33,36 +91,10 @@ const Header = () => {
               {cartItems.length}
             </span>
           </Link>
-          <div className="relative group">
-            <button
-              onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-              className="text-white flex items-center"
-            >
-              <FiUser className="mr-1" />
-              Profile
-            </button>
-            <ul
-              className={`absolute ${
-                isProfileMenuOpen ? "block" : "hidden"
-              } bg-gray-800 p-2 mt-2 space-y-2 text-white`}
-            >
-              <li>
-                <Link to="/profile">
-                  <FiUser className="mr-1" />
-                  Profile
-                </Link>
-              </li>
-              <li>
-                <Link to="/logout">
-                  <FiLogOut className="mr-1" />
-                  Logout
-                </Link>
-              </li>
-            </ul>
-          </div>
-          <Link to="/login">
-            <button className="text-white">Sign In</button>
-          </Link>
+          {userInfo && (
+            <div className="relative group">{renderProfileButton()}</div>
+          )}
+          {!userInfo && renderSignInButton()}
         </div>
         <div className="sm:hidden">
           <button
@@ -91,36 +123,10 @@ const Header = () => {
                 {cartItems.length}
               </span>
             </Link>
-            <div className="relative group ">
-              <button
-                onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                className="text-white flex items-center"
-              >
-                <FiUser className="mr-1" />
-                Profile
-              </button>
-              <ul
-                className={`absolute ${
-                  isProfileMenuOpen ? "block" : "hidden"
-                } bg-gray-800 p-2 mt-2 space-y-2 text-white`}
-              >
-                <li>
-                  <Link to="/profile">
-                    <FiUser className="mr-1" />
-                    Profile
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/logout">
-                    <FiLogOut className="mr-1" />
-                    Logout
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <Link to="/login">
-              <button className="text-white">Sign In</button>
-            </Link>
+            {userInfo && (
+              <div className="relative group ">{renderProfileButton()}</div>
+            )}
+            {!userInfo && renderSignInButton()}
           </div>
         </div>
       )}
