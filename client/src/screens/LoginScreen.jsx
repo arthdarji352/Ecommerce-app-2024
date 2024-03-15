@@ -8,6 +8,7 @@ import {
 import { setCredentials } from "../slices/userSlice";
 import Spinner from "../components/Spinner";
 import { toast } from "react-toastify";
+import { BACKEND_URL } from "../constants";
 
 const LoginScreen = () => {
   const dispatch = useDispatch();
@@ -44,6 +45,14 @@ const LoginScreen = () => {
       } catch (err) {
         toast.error(err?.data?.message || err.error);
       }
+    }
+  };
+
+  const handleGoogleAuth = () => {
+    try {
+      window.location.href = `${BACKEND_URL}/auth/google/callback`;
+    } catch (err) {
+      toast.error(err?.data?.message || err.error);
     }
   };
   return (
@@ -97,6 +106,7 @@ const LoginScreen = () => {
               Login
             </button>
             <button
+              onClick={handleGoogleAuth}
               type="button"
               className="bg-red-600 text-white px-4 py-2 rounded-md mt-4 ml-3 hover:bg-red-700"
             >
