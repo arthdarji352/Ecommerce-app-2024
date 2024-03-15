@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { useDispatch } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   useForgotPasswordMutation,
   useLoginMutation,
@@ -19,6 +19,18 @@ const LoginScreen = () => {
   const [login, { isLoading }] = useLoginMutation();
   const [forgotPassword, { isLoading: isLoadingPassword }] =
     useForgotPasswordMutation();
+
+  const { userInfo } = useSelector((state) => state.user);
+
+  const { search } = useLocation();
+  const sp = new URLSearchParams(search);
+  const redirect = sp.get("redirect") || "/";
+
+  useEffect(() => {
+    if (userInfo) {
+      navigate(redirect);
+    }
+  }, [navigate, redirect, userInfo]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
