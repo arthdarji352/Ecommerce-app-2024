@@ -23,8 +23,11 @@ const LoginScreen = () => {
   const { userInfo } = useSelector((state) => state.user);
 
   const { search } = useLocation();
+  // console.log(search);
   const sp = new URLSearchParams(search);
+  // console.log(sp);
   const redirect = sp.get("redirect") || "/";
+  // console.log(redirect);
 
   useEffect(() => {
     if (userInfo) {
@@ -37,7 +40,7 @@ const LoginScreen = () => {
 
     try {
       const res = await login({ email, password }).unwrap();
-      console.log(res);
+      // console.log(res);
       dispatch(setCredentials({ ...res }));
       navigate("/");
       toast.success("Login Successful", { position: "top-center" });
