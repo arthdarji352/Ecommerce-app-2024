@@ -17,7 +17,7 @@ const HomeScreen = () => {
       const res = await axios.get(`${BACKEND_URL}/auth/login/success`, {
         withCredentials: true,
       });
-      console.log(res.data);
+      // console.log(res.data);
       dispatch(
         setCredentials({
           ...res.data.user._json,

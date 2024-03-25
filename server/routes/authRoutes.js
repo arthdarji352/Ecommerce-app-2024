@@ -28,7 +28,7 @@ router.get("/google", async (req, res) => {
       }
     );
 
-    console.log(response);
+    // console.log(response);
     res.send(response);
   } catch (error) {
     console.log(error);

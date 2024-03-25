@@ -41,7 +41,7 @@ const getOrderById = asyncHandler(async (req, res) => {
     "name email"
   );
 
-  console.log(order);
+  // console.log(order);
 
   if (order) {
     res.status(200).json(order);
@@ -56,7 +56,7 @@ const getUserOrders = asyncHandler(async (req, res) => {
     "user",
     "id name"
   );
-  console.log(orders);
+  // console.log(orders);
   res.json(orders);
 });
 

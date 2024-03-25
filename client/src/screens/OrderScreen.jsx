@@ -1,5 +1,8 @@
 import { useParams } from "react-router-dom";
-import { useGetOrderDetailsQuery } from "../slices/orderApiSlice";
+import {
+  useGetOrderDetailsQuery,
+  usePayWithStripeMutation,
+} from "../slices/orderApiSlice";
 import { toast } from "react-toastify";
 import Spinner from "../components/Spinner";
 import { useSelector } from "react-redux";
@@ -14,6 +17,9 @@ const OrderScreen = () => {
     refetch,
   } = useGetOrderDetailsQuery(orderId);
 
+  const [payWithStripe, { isLoading: loadingStripe }] =
+    usePayWithStripeMutation();
+
   if (error) {
     return toast.error(error.message);
   }
@@ -23,6 +29,15 @@ const OrderScreen = () => {
   }
 
   const { shippingAddress, user, isDelivered, orderItems } = order;
+
+  const handleStripePayment = async (orderItems) => {
+    try {
+      const res = await payWithStripe(orderItems).unwrap();
+      window.location.href = res.url;
+    } catch (error) {
+      toast.error(error?.data?.message || error?.error);
+    }
+  };
 
   const calculateTotal = (orderItems) => {
     return orderItems.reduce((acc, item) => acc + item.price * item.qty, 0);
@@ -83,7 +98,10 @@ const OrderScreen = () => {
             Total: {calculateTotal(orderItems).toFixed(2)}
           </p>
         </div>
-        <button className="bg-blue-500 text-white px-4 py-2 rounded-md mt-4 hover:bg-blue-600 mr-3">
+        <button
+          onClick={() => handleStripePayment(orderItems)}
+          className="bg-blue-500 text-white px-4 py-2 rounded-md mt-4 hover:bg-blue-600 mr-3"
+        >
           Pay with Stripe
         </button>
         {userInfo.isAdmin && !order.isDelivered && (

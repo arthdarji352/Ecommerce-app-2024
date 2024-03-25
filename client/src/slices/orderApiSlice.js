@@ -1,5 +1,5 @@
 import { apiSlice } from "./apiSlice";
-import { ORDERS_URL } from "../constants";
+import { BACKEND_URL, ORDERS_URL } from "../constants";
 
 export const orderApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -22,6 +22,13 @@ export const orderApiSlice = apiSlice.injectEndpoints({
       }),
       keepUnusedDataFor: 5,
     }),
+    payWithStripe: builder.mutation({
+      query: (orderItems) => ({
+        url: `${BACKEND_URL}/create-checkout-session`,
+        method: "POST",
+        body: orderItems,
+      }),
+    }),
   }),
 });
 
@@ -29,4 +36,5 @@ export const {
   useCreateOrderMutation,
   useGetOrderDetailsQuery,
   useGetUserOrdersQuery,
+  usePayWithStripeMutation,
 } = orderApiSlice;

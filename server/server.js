@@ -9,6 +9,7 @@ import cookieParser from "cookie-parser";
 import passport from "./utils/passport.js";
 import authRoutes from "./routes/authRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
+import stripeUtil from "./utils/stripe.js";
 
 dotenv.config();
 connectDB();
@@ -36,6 +37,7 @@ app.use(
 
 app.use(cookieParser());
 passport(app);
+stripeUtil(app);
 
 app.get("/", (req, res) => {
   res.send("App is runing");
