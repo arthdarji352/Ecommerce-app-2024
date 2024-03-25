@@ -36,8 +36,8 @@ export default function PlaceOrderScreen() {
         totalPrice,
       }).unwrap();
       dispatch(clearCartItems());
-      toast.success("Order Placed!");
-      //navigate(`/order/${res._id}`)
+      // toast.success("Order Placed!");
+      navigate(`/order/${res._id}`);
     } catch (err) {
       toast.error(err?.data?.message || err.error);
     }
