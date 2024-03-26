@@ -12,6 +12,7 @@ const Header = () => {
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false);
 
   const { cartItems } = useSelector((state) => state.cart);
   const { userInfo } = useSelector((state) => state.user);
@@ -67,6 +68,36 @@ const Header = () => {
       <button className="text-white">Sign In</button>
     </Link>
   );
+
+  const renderAdminButton = () => {
+    return (
+      <>
+        <button
+          onClick={() => setIsAdminMenuOpen(!isAdminMenuOpen)}
+          className="text-white flex items-center"
+        >
+          <FiUser className="mr-1" />
+          Admin
+          {isAdminMenuOpen ? <FaCaretUp /> : <FaCaretDown />}
+        </button>
+        <ul
+          className={`absolute ${
+            isAdminMenuOpen ? "block" : "hidden"
+          } bg-gray-800 p-2 mt-2 space-y-2 text-white border rounded-md`}
+        >
+          <li>
+            <Link to="/admin/users">Users</Link>
+          </li>
+          <li>
+            <Link to="/admin/products">Products</Link>
+          </li>
+          <li>
+            <Link to="/admin/orders">Orders</Link>
+          </li>
+        </ul>
+      </>
+    );
+  };
   return (
     <nav className="bg-gray-800 p-4">
       <div className="flex items-center justify-between">
@@ -93,6 +124,9 @@ const Header = () => {
           </Link>
           {userInfo && (
             <div className="relative group">{renderProfileButton()}</div>
+          )}
+          {userInfo?.isAdmin && (
+            <div className="relative group ">{renderAdminButton()}</div>
           )}
           {!userInfo && renderSignInButton()}
         </div>
@@ -125,6 +159,9 @@ const Header = () => {
             </Link>
             {userInfo && (
               <div className="relative group ">{renderProfileButton()}</div>
+            )}
+            {userInfo?.isAdmin && (
+              <div className="relative group ">{renderAdminButton()}</div>
             )}
             {!userInfo && renderSignInButton()}
           </div>
