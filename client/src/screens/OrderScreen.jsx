@@ -1,5 +1,6 @@
 import { useParams } from "react-router-dom";
 import {
+  useDeliverOrderMutation,
   useGetOrderDetailsQuery,
   usePayWithStripeMutation,
 } from "../slices/orderApiSlice";
@@ -20,6 +21,9 @@ const OrderScreen = () => {
   const [payWithStripe, { isLoading: loadingStripe }] =
     usePayWithStripeMutation();
 
+  const [deliverOrder, { isLoading: loadingDeliver }] =
+    useDeliverOrderMutation();
+
   if (error) {
     return toast.error(error.message);
   }
@@ -28,7 +32,14 @@ const OrderScreen = () => {
     return <Spinner />;
   }
 
-  const { shippingAddress, user, isDelivered, orderItems } = order;
+  const {
+    shippingAddress,
+    user,
+    isDelivered,
+    orderItems,
+    shippingPrice,
+    taxPrice,
+  } = order;
 
   const handleStripePayment = async (orderItems) => {
     try {
@@ -39,8 +50,15 @@ const OrderScreen = () => {
     }
   };
 
+  // prettier-ignore
   const calculateTotal = (orderItems) => {
-    return orderItems.reduce((acc, item) => acc + item.price * item.qty, 0);
+    return orderItems.reduce((acc, item) => acc + (item.price * item.qty), 0);
+  };
+
+  const deliverOrderHandler = async (orderId) => {
+    await deliverOrder(orderId);
+    toast.success("Order Delivered");
+    refetch();
   };
 
   return (
@@ -91,11 +109,24 @@ const OrderScreen = () => {
                 </th>
               </tr>
             ))}
+            <tr className="border-b border-gray-400">
+              <td className="text-left font-semibold">Shipping</td>
+              <td className="text-right"></td>
+              <td className="text-right">${shippingPrice}</td>
+            </tr>
+            <tr className="border-b border-gray-400">
+              <td className="text-left font-semibold">Tax</td>
+              <td className="text-right"></td>
+              <td className="text-right">${taxPrice}</td>
+            </tr>
           </tbody>
         </table>
         <div className="mt-4">
           <p className="text-right font-semibold">
-            Total: {calculateTotal(orderItems).toFixed(2)}
+            Total: $
+            {+calculateTotal(orderItems).toFixed(2) +
+              +shippingPrice +
+              +taxPrice}
           </p>
         </div>
         <button
@@ -105,7 +136,10 @@ const OrderScreen = () => {
           Pay with Stripe
         </button>
         {userInfo.isAdmin && !order.isDelivered && (
-          <button className="bg-gray-800 text-white px-4 py-2 rounded-md mt-4 hover:bg-gray-950">
+          <button
+            onClick={() => deliverOrderHandler(orderId)}
+            className="bg-gray-800 text-white px-4 py-2 rounded-md mt-4 hover:bg-gray-950"
+          >
             Mark as Delivered
           </button>
         )}

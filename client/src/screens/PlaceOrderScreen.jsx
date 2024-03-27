@@ -79,10 +79,20 @@ export default function PlaceOrderScreen() {
                 </th>
               </tr>
             ))}
+            <tr className="border-b border-gray-400">
+              <td className="text-left font-semibold">Shipping</td>
+              <td className="text-right"></td>
+              <td className="text-right">${shippingPrice}</td>
+            </tr>
+            <tr className="border-b border-gray-400">
+              <td className="text-left font-semibold">Tax</td>
+              <td className="text-right"></td>
+              <td className="text-right">${taxPrice}</td>
+            </tr>
           </tbody>
         </table>
         <div className="mt-4">
-          <p className="text-right font-semibold">Total: {totalPrice}</p>
+          <p className="text-right font-semibold">Total: ${totalPrice}</p>
         </div>
         <button
           className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded w-full mt-4"
