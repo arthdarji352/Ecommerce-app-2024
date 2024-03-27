@@ -60,4 +60,15 @@ const getUserOrders = asyncHandler(async (req, res) => {
   res.json(orders);
 });
 
-export { addOrderItems, getOrderById, getUserOrders };
+const getAllOrders = asyncHandler(async (req, res) => {
+  const orders = await Order.find().populate("user", "id name");
+  // console.log(orders);
+  if (orders) {
+    res.status(200).json(orders);
+  } else {
+    res.status(404);
+    throw new Error("Order not found");
+  }
+});
+
+export { addOrderItems, getOrderById, getUserOrders, getAllOrders };
