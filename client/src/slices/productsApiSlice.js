@@ -34,6 +34,13 @@ export const productsApiSlice = apiSlice.injectEndpoints({
         method: "DELETE",
       }),
     }),
+    uploadFileHandler: builder.mutation({
+      query: (data) => ({
+        url: "/api/upload",
+        method: "POST",
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -43,4 +50,5 @@ export const {
   useCreateProductMutation,
   useUpdateProductMutation,
   useDeleteProductMutation,
+  useUploadFileHandlerMutation,
 } = productsApiSlice;

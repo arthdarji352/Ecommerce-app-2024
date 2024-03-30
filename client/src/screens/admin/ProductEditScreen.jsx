@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import {
   useGetProductDetailsQuery,
   useUpdateProductMutation,
+  useUploadFileHandlerMutation,
 } from "../../slices/productsApiSlice";
 import { toast } from "react-toastify";
 import { useNavigate, useParams } from "react-router-dom";
@@ -9,8 +10,11 @@ import Spinner from "../../components/Spinner";
 
 export default function ProductEditScreen() {
   const { id: productId } = useParams();
-  const [updateProduct, { isLoading: uploadLoading }, refetch] =
+  const [updateProduct, { isLoading: uploadProductLoading }, refetch] =
     useUpdateProductMutation();
+
+  const [uploadProductImage, { isLoading: uploadLoading }] =
+    useUploadFileHandlerMutation();
 
   //   const {
   //     data: product,
@@ -70,6 +74,22 @@ export default function ProductEditScreen() {
     }
   };
 
+  const uploadFileHandler = async (e) => {
+    const formData = new FormData();
+    formData.append("image", e.target.files[0]);
+    console.log(formData);
+    try {
+      const res = await uploadProductImage(formData).unwrap();
+      console.log(res);
+      toast.success(res.message);
+      setProductData({
+        ...productData,
+        image: res.image,
+      });
+    } catch (error) {
+      toast.error(error?.data?.message || error?.error);
+    }
+  };
   return (
     <div className="w-1/3 mx-auto">
       <h2 className="text-2xl font-semibold mb-4">Edit Product</h2>
@@ -108,6 +128,8 @@ export default function ProductEditScreen() {
             type="file"
             id="image"
             name="image"
+            accept="image/*"
+            onChange={uploadFileHandler}
             className="w-full border border-gray-300 p-2 rounded-md"
           />
         </div>
