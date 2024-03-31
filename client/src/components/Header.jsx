@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { FiShoppingCart, FiUser, FiLogOut, FiLogIn } from "react-icons/fi";
 import { FaCaretUp, FaCaretDown } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
@@ -8,11 +8,13 @@ import { logout } from "../slices/userSlice";
 import { useLogoutMutation } from "../slices/userApiSlice";
 
 const Header = () => {
+  const { keyword } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false);
+  const [keyWord, setkeyWord] = useState(keyword || "");
 
   const { cartItems } = useSelector((state) => state.cart);
   const { userInfo } = useSelector((state) => state.user);
@@ -98,6 +100,16 @@ const Header = () => {
       </>
     );
   };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (keyWord) {
+      navigate(`/search/${keyWord.trim()}`);
+      setkeyWord("");
+    } else {
+      navigate("/");
+    }
+  };
   return (
     <nav className="bg-gray-800 p-4">
       <div className="flex items-center justify-between">
@@ -109,8 +121,13 @@ const Header = () => {
             type="text"
             placeholder="Search"
             className="ml-4 p-2 rounded-md bg-gray-700 text-white hidden sm:block"
+            value={keyWord}
+            onChange={(e) => setkeyWord(e.target.value)}
           />
-          <button className="bg-blue-500 text-white py-2 px-4 rounded-md hidden sm:block ml-2">
+          <button
+            onClick={handleSearch}
+            className="bg-blue-500 text-white py-2 px-4 rounded-md hidden sm:block ml-2"
+          >
             Search
           </button>
         </div>

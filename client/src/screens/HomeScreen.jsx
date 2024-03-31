@@ -7,10 +7,12 @@ import axios from "axios";
 import { useDispatch } from "react-redux";
 import { setCredentials } from "../slices/userSlice";
 import { BACKEND_URL } from "../constants";
+import { useParams } from "react-router-dom";
 
 const HomeScreen = () => {
+  const { keyword } = useParams();
   const dispatch = useDispatch();
-  const { data: products, isLoading, error } = useGetProductsQuery();
+  const { data: products, isLoading, error } = useGetProductsQuery(keyword);
 
   const getUser = async () => {
     try {
