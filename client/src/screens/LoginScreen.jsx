@@ -123,7 +123,7 @@ const LoginScreen = () => {
             <button
               onClick={handleGoogleAuth}
               type="button"
-              className="bg-red-600 text-white px-4 py-2 rounded-md mt-4 ml-3 hover:bg-red-700"
+              className="bg-red-600 hidden text-white px-4 py-2 rounded-md mt-4 ml-3 hover:bg-red-700"
             >
               Sign in with Google
             </button>
